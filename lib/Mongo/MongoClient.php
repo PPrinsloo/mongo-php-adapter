@@ -31,8 +31,8 @@ class MongoClient
     use Helper\ReadPreference;
     use Helper\WriteConcern;
 
-    const VERSION = '1.6.12';
-    const DEFAULT_HOST = "localhost";
+    const VERSION = '1.19.4';
+    const DEFAULT_HOST = "mongodb";
     const DEFAULT_PORT = 27017;
     const RP_PRIMARY = "primary";
     const RP_PRIMARY_PREFERRED = "primaryPreferred";

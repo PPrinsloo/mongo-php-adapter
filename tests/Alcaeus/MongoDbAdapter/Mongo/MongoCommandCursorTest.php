@@ -53,8 +53,8 @@ class MongoCommandCursorTest extends TestCase
             'id' => 0,
             'at' => 0,
             'numReturned' => 0,
-            'server' => 'localhost:27017;-;.;' . getmypid(),
-            'host' => 'localhost',
+            'server' => 'mongodb:27017;-;.;' . getmypid(),
+            'host' => 'mongodb',
             'port' => 27017,
             'connection_type_desc' => 'STANDALONE',
         ];

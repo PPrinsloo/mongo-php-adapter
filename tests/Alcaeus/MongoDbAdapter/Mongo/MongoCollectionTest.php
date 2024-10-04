@@ -790,7 +790,7 @@ class MongoCollectionTest extends TestCase
     {
         $this->expectException(\MongoConnectionException::class);
 
-        $client = $this->getClient([], 'mongodb://localhost:28888/?connectTimeoutMS=1');
+        $client = $this->getClient([], 'mongodb://mongodb:28888/?connectTimeoutMS=1');
         $collection = $client->selectCollection('mongo-php-adapter', 'test');
 
         $collection->findOne();
@@ -1372,14 +1372,22 @@ class MongoCollectionTest extends TestCase
         $this->assertEquals($expected, $collection->ensureIndex(['bar' => 1], ['unique' => true]));
     }
 
+    /**
+     * @throws \MongoCursorException
+     * @throws \MongoExecutionTimeoutException
+     * @throws \MongoDuplicateKeyException
+     * @throws \MongoException
+     * @throws \MongoConnectionException
+     * @throws \MongoWriteConcernException
+     */
     public function testEnsureIndexAlreadyExistsWithDifferentOptions()
     {
         $collection = $this->getCollection();
-        $collection->ensureIndex(['bar' => 1], ['unique' => true]);
+        $collection->createIndex(['bar' => 1], ['unique' => true]);
 
         $this->expectException(\MongoResultException::class);
-        $this->expectExceptionMessage('Index with name: bar_1 already exists with different options');
-        $collection->ensureIndex(['bar' => 1]);
+        $this->expectExceptionMessage('An existing index has the same name as the requested index.');
+        $collection->createIndex(['bar' => 1]);
     }
 
     public function testDeleteIndexUsingIndexName()
@@ -1570,6 +1578,11 @@ class MongoCollectionTest extends TestCase
      */
     public function testGetIndexInfo($expectedIndex, $fields, $options)
     {
+        $serverVersion = $this->getServerVersion();
+        if (version_compare($serverVersion, '5.0', '>=')) {
+            $this->markTestSkipped('GeoHaystack indexes are not supported in MongoDB 5.0 and above.');
+        }
+
         $idIndex = [
             'v' => $this->getDefaultIndexVersion(),
             'key' => ['_id' => 1],

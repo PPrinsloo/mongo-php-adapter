@@ -7,6 +7,8 @@ use MongoDB\Client;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Symfony\Bridge\PhpUnit\SetUpTearDownTrait;
 
+const MONGODB_URI = 'mongodb://mongodb:27017';
+
 abstract class TestCase extends BaseTestCase
 {
     use SetUpTearDownTrait;
@@ -184,7 +186,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * @return string
      */
-    protected function getServerVersion()
+    public function getServerVersion()
     {
         $serverInfo = $this->getDatabase()->command(['buildinfo' => true]);
         return $serverInfo['version'];

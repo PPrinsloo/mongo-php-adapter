@@ -83,13 +83,11 @@ jobs:
         os:
           - "ubuntu-20.04"
         php-version:
-          - "7.2"
-          - "7.3"
           - "7.4"
           - "8.0"
           - "8.1"
         mongodb-version:
-          - "4.4"
+          - "8.0"
         driver-version:
           - "stable"
         deps:

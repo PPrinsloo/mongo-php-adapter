@@ -71,7 +71,7 @@ class MongoCursorTest extends TestCase
 
     public function testCountCannotConnect()
     {
-        $client = $this->getClient(['connect' => false], 'mongodb://localhost:28888');
+        $client = $this->getClient(['connect' => false], 'mongodb://mongodb:28888');
         $cursor = $client->selectCollection('mongo-php-adapter', 'test')->find();
 
         $this->expectException(\MongoConnectionException::class);
@@ -363,8 +363,8 @@ class MongoCursorTest extends TestCase
             'id' => 0,
             'at' => 1,
             'numReturned' => 1,
-            'server' => 'localhost:27017;-;.;' . getmypid(),
-            'host' => 'localhost',
+            'server' => 'mongodb:27017;-;.;' . getmypid(),
+            'host' => 'mongodb',
             'port' => 27017,
             'connection_type_desc' => 'STANDALONE'
         ];
@@ -401,8 +401,8 @@ class MongoCursorTest extends TestCase
             'id' => 0,
             'at' => 1,
             'numReturned' => 1,
-            'server' => 'localhost:27017;-;.;' . getmypid(),
-            'host' => 'localhost',
+            'server' => 'mongodb:27017;-;.;' . getmypid(),
+            'host' => 'mongodb',
             'port' => 27017,
             'connection_type_desc' => 'STANDALONE'
         ];
@@ -426,9 +426,9 @@ class MongoCursorTest extends TestCase
         $collection = $this->getCollection();
         $cursor = $collection->find(['foo' => 'bar'], ['_id' => false])->skip(1)->limit(3);
 
+        // Define the common expected values for both versions
         $expected = [
             'queryPlanner' => [
-                'plannerVersion' => 1,
                 'namespace' => 'mongo-php-adapter.test',
                 'indexFilterSet' => false,
                 'parsedQuery' => [
@@ -450,7 +450,17 @@ class MongoCursorTest extends TestCase
             ],
         ];
 
-        $this->assertMatches($expected, $cursor->explain());
+        // Fetch the explain output
+        $explainOutput = $cursor->explain();
+
+        // Handle the difference between 'plannerVersion' and 'explainVersion'
+        if (isset($explainOutput['queryPlanner']['explainVersion'])) {
+            $expected['queryPlanner']['explainVersion'] = '1';  // Adjust for explainVersion
+        } else {
+            $expected['queryPlanner']['plannerVersion'] = 1; // Default to plannerVersion
+        }
+
+        $this->assertMatches($expected, $explainOutput);
     }
 
     public function testExplainWithEmptyProjection()

@@ -21,8 +21,8 @@ class MongoClientTest extends TestCase
     public function provideConnectionUri()
     {
         yield ['default', sprintf('mongodb://%s:%d', \MongoClient::DEFAULT_HOST, \MongoClient::DEFAULT_PORT)];
-        yield ['localhost', 'mongodb://localhost'];
-        yield ['mongodb://localhost', 'mongodb://localhost'];
+        yield ['mongodb', 'mongodb://mongodb'];
+        yield ['mongodb://mongodb', 'mongodb://mongodb'];
     }
 
     public function testSerialize()
@@ -76,8 +76,8 @@ class MongoClientTest extends TestCase
         $hosts = $client->getHosts();
         $this->assertMatches(
             [
-                'localhost:27017;-;.;' . getmypid() => [
-                    'host' => 'localhost',
+                'mongodb:27017;-;.;' . getmypid() => [
+                    'host' => 'mongodb',
                     'port' => 27017,
                     'health' => 1,
                     'state' => 0,
@@ -139,7 +139,7 @@ class MongoClientTest extends TestCase
 
     public function testNoPrefixUri()
     {
-        $client = $this->getClient(null, 'localhost');
+        $client = $this->getClient(null, 'mongodb');
         $this->assertNotNull($client);
     }
 
@@ -180,32 +180,32 @@ class MongoClientTest extends TestCase
         return [
             'optionsArray' => [
                 'options' => $options,
-                'uri' => 'mongodb://localhost',
+                'uri' => 'mongodb://mongodb',
                 'expectedTagsets' => [['a' => 'b']],
             ],
             'queryString' => [
                 'options' => [],
-                'uri' => 'mongodb://localhost/?' . self::makeOptionString($options),
+                'uri' => 'mongodb://mongodb/?' . self::makeOptionString($options),
                 'expectedTagsets' => [['a' => 'b']],
             ],
             'multipleInQueryString' => [
                 'options' => [],
-                'uri' => 'mongodb://localhost/?' . self::makeOptionString($options) . '&readPreferenceTags=c:d',
+                'uri' => 'mongodb://mongodb/?' . self::makeOptionString($options) . '&readPreferenceTags=c:d',
                 'expectedTagsets' => [['a' => 'b'], ['c' => 'd']],
             ],
             'overridden' => [
                 'options' => $options,
-                'uri' => 'mongodb://localhost/?' . self::makeOptionString($overriddenOptions),
+                'uri' => 'mongodb://mongodb/?' . self::makeOptionString($overriddenOptions),
                 'expectedTagsets' => [['c' => 'd'], ['a' => 'b']],
             ],
             'multipleTagsetsOptions' => [
                 'options' => $multipleTagsets,
-                'uri' => 'mongodb://localhost',
+                'uri' => 'mongodb://mongodb',
                 'expectedTagsets' => [['a' => 'b', 'c' => 'd']],
             ],
             'multipleTagsetsQueryString' => [
                 'options' => null,
-                'uri' => 'mongodb://localhost/?' . self::makeOptionString($multipleTagsets),
+                'uri' => 'mongodb://mongodb/?' . self::makeOptionString($multipleTagsets),
                 'expectedTagsets' => [['a' => 'b', 'c' => 'd']],
             ],
         ];
@@ -237,15 +237,15 @@ class MongoClientTest extends TestCase
         return [
             'optionsArray' => [
                 'options' => $options,
-                'uri' => 'mongodb://localhost',
+                'uri' => 'mongodb://mongodb',
             ],
             'queryString' => [
                 'options' => [],
-                'uri' => 'mongodb://localhost/?' . self::makeOptionString($options),
+                'uri' => 'mongodb://mongodb/?' . self::makeOptionString($options),
             ],
             'overridden' => [
                 'options' => $options,
-                'uri' => 'mongodb://localhost/?' . self::makeOptionString($overriddenOptions),
+                'uri' => 'mongodb://mongodb/?' . self::makeOptionString($overriddenOptions),
             ]
         ];
     }
@@ -268,7 +268,7 @@ class MongoClientTest extends TestCase
         $this->expectException(\MongoConnectionException::class);
         $this->expectExceptionMessage('Authentication failed');
 
-        $client = $this->getClient([], 'mongodb://alcaeus:mySuperSecurePassword@localhost');
+        $client = $this->getClient([], 'mongodb://alcaeus:mySuperSecurePassword@mongodb');
         $collection = $client->selectCollection('test', 'foo');
 
         $document = ['foo' => 'bar'];
@@ -278,7 +278,7 @@ class MongoClientTest extends TestCase
 
     public function testConnectionUriOptionIntegerTypeCasting()
     {
-        $client = new \MongoClient('mongodb://localhost/db?w=0&wtimeout=0', ['connect' => false]);
+        $client = new \MongoClient('mongodb://mongodb/db?w=0&wtimeout=0', ['connect' => false]);
 
         $this->assertSame(['w' => 0, 'wtimeout' => 0], $client->getWriteConcern());
     }
