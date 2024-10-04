@@ -38,7 +38,7 @@ trait ReadPreference
     public function getReadPreference()
     {
         if ($this->readPreference === null) {
-            $this->readPreference = new \MongoDB\Driver\ReadPreference(\MongoDB\Driver\ReadPreference::RP_PRIMARY);
+            $this->readPreference = new \MongoDB\Driver\ReadPreference(\MongoDB\Driver\ReadPreference::PRIMARY);
         }
 
         $mode = $this->readPreference->getMode();
@@ -73,7 +73,7 @@ trait ReadPreference
      */
     protected function getSlaveOkayFromReadPreference()
     {
-        return $this->readPreference->getMode() != \MongoDB\Driver\ReadPreference::RP_PRIMARY;
+        return $this->readPreference->getMode() != \MongoDB\Driver\ReadPreference::PRIMARY;
     }
 
     /**
@@ -81,7 +81,7 @@ trait ReadPreference
      * @param array $tags
      * @return bool
      */
-    protected function setReadPreferenceFromParameters($readPreference, $tags = null)
+    protected function setReadPreferenceFromParameters($readPreference, $tags = null): bool
     {
         // @internal Passing an array for $readPreference is necessary to avoid conversion voodoo
         // It should not be used externally!
@@ -91,19 +91,19 @@ trait ReadPreference
 
         switch ($readPreference) {
             case \MongoClient::RP_PRIMARY:
-                $mode = \MongoDB\Driver\ReadPreference::RP_PRIMARY;
+                $mode = \MongoDB\Driver\ReadPreference::PRIMARY;
                 break;
             case \MongoClient::RP_PRIMARY_PREFERRED:
-                $mode = \MongoDB\Driver\ReadPreference::RP_PRIMARY_PREFERRED;
+                $mode = \MongoDB\Driver\ReadPreference::PRIMARY_PREFERRED;
                 break;
             case \MongoClient::RP_SECONDARY:
-                $mode = \MongoDB\Driver\ReadPreference::RP_SECONDARY;
+                $mode = \MongoDB\Driver\ReadPreference::SECONDARY;
                 break;
             case \MongoClient::RP_SECONDARY_PREFERRED:
-                $mode = \MongoDB\Driver\ReadPreference::RP_SECONDARY_PREFERRED;
+                $mode = \MongoDB\Driver\ReadPreference::SECONDARY_PREFERRED;
                 break;
             case \MongoClient::RP_NEAREST:
-                $mode = \MongoDB\Driver\ReadPreference::RP_NEAREST;
+                $mode = \MongoDB\Driver\ReadPreference::NEAREST;
                 break;
             default:
                 trigger_error("The value '$readPreference' is not valid as read preference type", E_USER_WARNING);
@@ -140,7 +140,7 @@ trait ReadPreference
     {
         $result = $this->getSlaveOkayFromReadPreference();
         $readPreference = new \MongoDB\Driver\ReadPreference(
-            $ok ? \MongoDB\Driver\ReadPreference::RP_SECONDARY_PREFERRED : \MongoDB\Driver\ReadPreference::RP_PRIMARY,
+            $ok ? \MongoDB\Driver\ReadPreference::SECONDARY_PREFERRED : \MongoDB\Driver\ReadPreference::PRIMARY,
             $ok ? $this->readPreference->getTagSets() : []
         );
 
